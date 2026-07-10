@@ -39,6 +39,7 @@ yarn-error.log*
 # importer geocode cache (local, regenerable)
 db/importers/.geocode_cache.json
 db/imports/
+db/importers/__pycache__/
 
 # typescript
 *.tsbuildinfo
