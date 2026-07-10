@@ -53,10 +53,10 @@ export default function Home() {
           <Image
             src="/racenex-wordmark-light.png"
             alt="racenex"
-            width={924}
-            height={360}
+            width={398}
+            height={116}
             priority
-            className="h-[26px] w-auto"
+            className="h-[30px] w-auto"
           />
           <a
             href="#join"
@@ -143,9 +143,9 @@ export default function Home() {
           <Image
             src="/racenex-wordmark-light.png"
             alt="racenex"
-            width={924}
-            height={360}
-            className="h-[22px] w-auto opacity-[0.92]"
+            width={398}
+            height={116}
+            className="h-[26px] w-auto opacity-[0.92]"
           />
           <div className="font-display text-[13px] font-semibold italic uppercase tracking-[0.03em] text-[#5A636E]">
             Für die, die am Start stehen · 2026
