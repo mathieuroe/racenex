@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import WaitlistForm from "@/components/WaitlistForm";
+import AuthNav from "@/components/AuthNav";
 import { supabase } from "@/lib/supabase";
 
 export const revalidate = 0;
@@ -69,12 +70,15 @@ export default async function Home() {
             priority
             className="h-[30px] w-auto"
           />
-          <a
-            href="#join"
-            className="-skew-x-[4deg] rounded-md bg-signal px-[18px] py-[9px] font-display text-[15px] font-bold italic uppercase tracking-[0.04em] text-white transition-colors hover:bg-chalk hover:text-void max-[720px]:hidden"
-          >
-            <span className="inline-block skew-x-[4deg]">Früh dabei sein</span>
-          </a>
+          <div className="flex items-center gap-6">
+            <AuthNav />
+            <a
+              href="#join"
+              className="-skew-x-[4deg] rounded-md bg-signal px-[18px] py-[9px] font-display text-[15px] font-bold italic uppercase tracking-[0.04em] text-white transition-colors hover:bg-chalk hover:text-void max-[720px]:hidden"
+            >
+              <span className="inline-block skew-x-[4deg]">Früh dabei sein</span>
+            </a>
+          </div>
         </div>
       </header>
 

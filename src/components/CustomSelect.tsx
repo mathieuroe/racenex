@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export type SelectOption = {
   value: string;
@@ -15,6 +15,8 @@ export default function CustomSelect({
   options,
   onChange,
   disabled,
+  searchable,
+  searchPlaceholder = "Suchen…",
 }: {
   label: string;
   placeholder: string;
@@ -22,12 +24,22 @@ export default function CustomSelect({
   options: SelectOption[];
   onChange: (value: string) => void;
   disabled?: boolean;
+  searchable?: boolean;
+  searchPlaceholder?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [query, setQuery] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const selected = options.find((o) => o.value === value);
+
+  const visibleOptions = useMemo(() => {
+    if (!searchable || !query.trim()) return options;
+    const q = query.trim().toLowerCase();
+    return options.filter((o) => o.label.toLowerCase().includes(q));
+  }, [options, query, searchable]);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -39,15 +51,20 @@ export default function CustomSelect({
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (open && searchable) searchRef.current?.focus();
+  }, [open, searchable]);
+
   function openList() {
     if (disabled) return;
     setOpen(true);
+    setQuery("");
     const idx = options.findIndex((o) => o.value === value);
     setActiveIndex(idx >= 0 ? idx : 0);
   }
 
   function commit(index: number) {
-    const opt = options[index];
+    const opt = visibleOptions[index];
     if (!opt || opt.disabled) return;
     onChange(opt.value);
     setOpen(false);
@@ -66,7 +83,7 @@ export default function CustomSelect({
       setOpen(false);
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex((i) => Math.min(options.length - 1, i + 1));
+      setActiveIndex((i) => Math.min(visibleOptions.length - 1, i + 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex((i) => Math.max(0, i - 1));
@@ -107,30 +124,44 @@ export default function CustomSelect({
       </button>
 
       {open && (
-        <ul
-          role="listbox"
-          className="absolute z-50 mt-1.5 max-h-[280px] w-full overflow-auto rounded-[9px] border border-line bg-carbon py-1.5 shadow-[0_8px_24px_rgba(12,17,22,0.12)]"
-        >
-          {options.length === 0 && (
-            <li className="px-4 py-2.5 text-[14px] text-fog">Keine Optionen</li>
+        <div className="absolute z-50 mt-1.5 w-full overflow-hidden rounded-[9px] border border-line bg-carbon shadow-[0_8px_24px_rgba(12,17,22,0.12)]">
+          {searchable && (
+            <div className="border-b border-line p-2">
+              <input
+                ref={searchRef}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActiveIndex(0);
+                }}
+                onKeyDown={onKeyDown}
+                placeholder={searchPlaceholder}
+                className="w-full rounded-md border border-line bg-void px-3 py-2 text-[14px] text-chalk placeholder:text-[#5A636E] focus:border-signal focus:outline-none"
+              />
+            </div>
           )}
-          {options.map((opt, i) => (
-            <li
-              key={opt.value}
-              role="option"
-              aria-selected={opt.value === value}
-              onMouseEnter={() => setActiveIndex(i)}
-              onClick={() => commit(i)}
-              className={`cursor-pointer px-4 py-2.5 text-[14.5px] transition-colors ${
-                opt.disabled ? "cursor-not-allowed text-[#5A636E]" : "text-chalk"
-              } ${i === activeIndex && !opt.disabled ? "bg-void" : ""} ${
-                opt.value === value ? "font-semibold text-signal" : ""
-              }`}
-            >
-              {opt.label}
-            </li>
-          ))}
-        </ul>
+          <ul role="listbox" className="max-h-[280px] overflow-auto py-1.5">
+            {visibleOptions.length === 0 && (
+              <li className="px-4 py-2.5 text-[14px] text-fog">Keine Optionen</li>
+            )}
+            {visibleOptions.map((opt, i) => (
+              <li
+                key={opt.value}
+                role="option"
+                aria-selected={opt.value === value}
+                onMouseEnter={() => setActiveIndex(i)}
+                onClick={() => commit(i)}
+                className={`cursor-pointer px-4 py-2.5 text-[14.5px] transition-colors ${
+                  opt.disabled ? "cursor-not-allowed text-[#5A636E]" : "text-chalk"
+                } ${i === activeIndex && !opt.disabled ? "bg-void" : ""} ${
+                  opt.value === value ? "font-semibold text-signal" : ""
+                }`}
+              >
+                {opt.label}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

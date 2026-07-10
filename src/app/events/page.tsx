@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import AuthNav from "@/components/AuthNav";
 import { supabase } from "@/lib/supabase";
 import { SPORT_LABEL } from "@/lib/sportLabels";
 
@@ -49,12 +50,15 @@ export default async function EventsPage() {
               className="h-[30px] w-auto"
             />
           </Link>
-          <Link
-            href="/#join"
-            className="-skew-x-[4deg] rounded-md bg-signal px-[18px] py-[9px] font-display text-[15px] font-bold italic uppercase tracking-[0.04em] text-white transition-colors hover:bg-chalk hover:text-void max-[720px]:hidden"
-          >
-            <span className="inline-block skew-x-[4deg]">Früh dabei sein</span>
-          </Link>
+          <div className="flex items-center gap-6">
+            <AuthNav />
+            <Link
+              href="/#join"
+              className="-skew-x-[4deg] rounded-md bg-signal px-[18px] py-[9px] font-display text-[15px] font-bold italic uppercase tracking-[0.04em] text-white transition-colors hover:bg-chalk hover:text-void max-[720px]:hidden"
+            >
+              <span className="inline-block skew-x-[4deg]">Früh dabei sein</span>
+            </Link>
+          </div>
         </div>
       </header>
 
