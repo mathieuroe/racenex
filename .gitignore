@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# importer geocode cache (local, regenerable)
+db/importers/.geocode_cache.json
+db/imports/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
