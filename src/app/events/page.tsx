@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { SPORT_LABEL } from "@/lib/sportLabels";
 
 export const revalidate = 0;
 
@@ -14,17 +15,6 @@ type EventRow = {
   event_date: string | null;
   city: string | null;
   country_code: string | null;
-};
-
-const SPORT_LABEL: Record<string, string> = {
-  triathlon: "Triathlon",
-  running: "Laufen",
-  hyrox: "Hyrox",
-  cycling: "Radfahren",
-  swimming: "Schwimmen",
-  obstacle: "OCR",
-  swimrun: "Swimrun",
-  other: "Sonstiges",
 };
 
 function formatDate(iso: string | null): string {

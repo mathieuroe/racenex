@@ -1,35 +1,74 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
+import CustomSelect from "@/components/CustomSelect";
+import { SPORT_LABEL, SPORT_ORDER } from "@/lib/sportLabels";
 
-const EVENTS = [
-  "Ironman 70.3 Venice 2027",
-  "Hyrox München (Winter 2026)",
-  "Marathon (München / Frankfurt / Berlin)",
-  "Halbmarathon (Herbst 2026)",
-  "Ironman 70.3 Luxembourg",
-  "Anderes / mehrere",
-];
+export type WaitlistEvent = {
+  slug: string;
+  name: string;
+  sport_type: string;
+  event_date: string | null;
+  city: string | null;
+  country_code: string | null;
+};
 
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeebygpe";
 
-const SELECT_ARROW =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231B3A8F' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")";
+function formatEventOptionLabel(event: WaitlistEvent): string {
+  const parts: string[] = [event.name];
+  if (event.event_date) {
+    parts.push(
+      new Date(event.event_date).toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "short",
+      })
+    );
+  }
+  if (event.city) parts.push(event.city);
+  return parts.join(" · ");
+}
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-export default function WaitlistForm() {
+export default function WaitlistForm({ events }: { events: WaitlistEvent[] }) {
   const [email, setEmail] = useState("");
-  const [event, setEvent] = useState("");
+  const [sport, setSport] = useState("");
+  const [eventSlug, setEventSlug] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
+
+  const sportOptions = SPORT_ORDER.map((key) => ({
+    value: key,
+    label: SPORT_LABEL[key],
+  }));
+
+  const eventsForSport = useMemo(
+    () => events.filter((e) => e.sport_type === sport),
+    [events, sport]
+  );
+
+  const eventOptions = eventsForSport.length
+    ? eventsForSport.map((e) => ({ value: e.slug, label: formatEventOptionLabel(e) }))
+    : [{ value: "", label: "Noch keine Events — wir sagen Bescheid", disabled: true }];
+
+  function handleSportChange(next: string) {
+    setSport(next);
+    setEventSlug("");
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email || !email.includes("@")) return;
-    if (!event) return;
+    if (!sport) return;
+    if (eventsForSport.length > 0 && !eventSlug) return;
 
     setStatus("submitting");
+
+    const chosenEvent = eventsForSport.find((ev) => ev.slug === eventSlug);
+    const eventLabel = chosenEvent
+      ? formatEventOptionLabel(chosenEvent)
+      : `Kein festes Event (${SPORT_LABEL[sport]})`;
 
     try {
       const res = await fetch(FORMSPREE_ENDPOINT, {
@@ -38,7 +77,7 @@ export default function WaitlistForm() {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, event }),
+        body: JSON.stringify({ email, sport: SPORT_LABEL[sport], event: eventLabel }),
       });
 
       if (!res.ok) {
@@ -46,7 +85,7 @@ export default function WaitlistForm() {
         throw new Error(data?.error || "Senden fehlgeschlagen");
       }
 
-      setMessage(`Notiert: ${event}. Wir melden uns, sobald der Raum offen ist.`);
+      setMessage(`Notiert: ${eventLabel}. Wir melden uns, sobald der Raum offen ist.`);
       setStatus("success");
     } catch {
       setMessage("Da ging etwas schief — bitte nochmal versuchen.");
@@ -90,32 +129,24 @@ export default function WaitlistForm() {
           className="w-full rounded-[9px] border-[1.5px] border-line bg-void px-[15px] py-3.5 text-[15.5px] text-chalk transition-colors placeholder:text-[#5A636E] focus:border-signal focus:outline-none"
         />
       </div>
-      <div>
-        <label
-          htmlFor="event"
-          className="mb-2 block font-display text-[12.5px] font-bold italic uppercase tracking-[0.1em] text-signal"
-        >
-          Dein nächstes Rennen
-        </label>
-        <select
-          id="event"
-          name="event"
-          required
-          value={event}
-          onChange={(e) => setEvent(e.target.value)}
-          style={{ backgroundImage: SELECT_ARROW }}
-          className="w-full cursor-pointer appearance-none rounded-[9px] border-[1.5px] border-line bg-void bg-no-repeat px-[15px] py-3.5 text-[15.5px] text-chalk transition-colors focus:border-signal focus:outline-none [background-position:right_15px_center]"
-        >
-          <option value="" disabled>
-            Wähle dein Event…
-          </option>
-          {EVENTS.map((ev) => (
-            <option key={ev} value={ev}>
-              {ev}
-            </option>
-          ))}
-        </select>
-      </div>
+
+      <CustomSelect
+        label="Deine Sportart"
+        placeholder="Wähle deine Sportart…"
+        value={sport}
+        options={sportOptions}
+        onChange={handleSportChange}
+      />
+
+      <CustomSelect
+        label="Dein nächstes Rennen"
+        placeholder="Wähle dein Event…"
+        value={eventSlug}
+        options={eventOptions}
+        onChange={setEventSlug}
+        disabled={!sport}
+      />
+
       <button
         type="submit"
         disabled={status === "submitting"}

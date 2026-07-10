@@ -1,6 +1,9 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import WaitlistForm from "@/components/WaitlistForm";
+import { supabase } from "@/lib/supabase";
+
+export const revalidate = 0;
 
 const SPLITS = [
   {
@@ -45,7 +48,15 @@ const CHIPS: { pre: string; bold: ReactNode }[] = [
   { pre: "", bold: "Verifizierte Ergebnisse" },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const { data } = await supabase
+    .from("events")
+    .select("slug, name, sport_type, event_date, city, country_code")
+    .order("event_date", { ascending: true })
+    .limit(200);
+
+  const events = data ?? [];
+
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-line bg-void/85 backdrop-blur-md">
@@ -132,7 +143,7 @@ export default function Home() {
                 racenex startet mit einer Handvoll Events. Sag uns, worauf du
                 hintrainierst — wir melden uns, sobald dein Raum offen ist.
               </p>
-              <WaitlistForm />
+              <WaitlistForm events={events} />
             </div>
           </div>
         </section>
