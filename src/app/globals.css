@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --void: #f4f6f8; /* paper white base */
+  --carbon: #ffffff; /* card surface */
+  --carbon-2: #fafbfc; /* subtle raised surface */
+  --line: #e2e7ec; /* hairline */
+  --fog: #5a6572; /* muted text */
+  --chalk: #0c1116; /* near-black ink */
+  --signal: #1b3a8f; /* deep cobalt — precise, engineered, anti-strava */
+  --signal-dim: #132c6e;
+}
+
+@theme inline {
+  --color-void: var(--void);
+  --color-carbon: var(--carbon);
+  --color-carbon-2: var(--carbon-2);
+  --color-line: var(--line);
+  --color-fog: var(--fog);
+  --color-chalk: var(--chalk);
+  --color-signal: var(--signal);
+  --color-signal-dim: var(--signal-dim);
+  --font-display: var(--font-barlow);
+  --font-body: var(--font-inter);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--void);
+  color: var(--chalk);
+}
+
+/* the signature: double-slash */
+.slash {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 800;
+  color: var(--signal);
+  letter-spacing: -0.06em;
+  transform: skewX(-2deg);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

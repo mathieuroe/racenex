@@ -1,0 +1,353 @@
+[
+  {
+    "slug": "ironman-703-venice-2027",
+    "name": "IRONMAN 70.3 Venice",
+    "sport_type": "triathlon",
+    "year": 2026,
+    "finisher_count": 2847,
+    "avg": 20610,
+    "median": 20523,
+    "best": 14411,
+    "distribution": [
+      {
+        "from_sec": 14400,
+        "to_sec": 16200,
+        "count": 135
+      },
+      {
+        "from_sec": 16200,
+        "to_sec": 18000,
+        "count": 383
+      },
+      {
+        "from_sec": 18000,
+        "to_sec": 19800,
+        "count": 604
+      },
+      {
+        "from_sec": 19800,
+        "to_sec": 21600,
+        "count": 702
+      },
+      {
+        "from_sec": 21600,
+        "to_sec": 23400,
+        "count": 577
+      },
+      {
+        "from_sec": 23400,
+        "to_sec": 25200,
+        "count": 296
+      },
+      {
+        "from_sec": 25200,
+        "to_sec": 27000,
+        "count": 111
+      },
+      {
+        "from_sec": 27000,
+        "to_sec": 28800,
+        "count": 28
+      },
+      {
+        "from_sec": 28800,
+        "to_sec": 30600,
+        "count": 11
+      },
+      {
+        "from_sec": 30600,
+        "to_sec": 32400,
+        "count": 0
+      }
+    ],
+    "splits": {
+      "swim": {
+        "avg_sec": 2460,
+        "top10_sec": 1920,
+        "note": "1,9 km · mit Strömung"
+      },
+      "bike": {
+        "avg_sec": 10680,
+        "top10_sec": 9060,
+        "note": "90 km · 920 hm"
+      },
+      "run": {
+        "avg_sec": 6720,
+        "top10_sec": 5760,
+        "note": "21,1 km · flach"
+      }
+    },
+    "ag_distribution": [
+      {
+        "ag": "AK25-29",
+        "count": 341,
+        "median_sec": 19800
+      },
+      {
+        "ag": "AK30-34",
+        "count": 569,
+        "median_sec": 19680
+      },
+      {
+        "ag": "AK35-39",
+        "count": 626,
+        "median_sec": 20100
+      },
+      {
+        "ag": "AK40-44",
+        "count": 540,
+        "median_sec": 20400
+      },
+      {
+        "ag": "AK45-49",
+        "count": 398,
+        "median_sec": 21120
+      },
+      {
+        "ag": "AK50+",
+        "count": 370,
+        "median_sec": 22200
+      }
+    ],
+    "source_note": "SYNTHETISCH — statistisch plausibles Modell zum Bau, keine echten Daten"
+  },
+  {
+    "slug": "marathon-muenchen-2026",
+    "name": "München Marathon",
+    "sport_type": "running",
+    "year": 2025,
+    "finisher_count": 9120,
+    "avg": 15124,
+    "median": 15106,
+    "best": 8422,
+    "distribution": [
+      {
+        "from_sec": 7200,
+        "to_sec": 9000,
+        "count": 36
+      },
+      {
+        "from_sec": 9000,
+        "to_sec": 10800,
+        "count": 343
+      },
+      {
+        "from_sec": 10800,
+        "to_sec": 12600,
+        "count": 1033
+      },
+      {
+        "from_sec": 12600,
+        "to_sec": 14400,
+        "count": 2113
+      },
+      {
+        "from_sec": 14400,
+        "to_sec": 16200,
+        "count": 2548
+      },
+      {
+        "from_sec": 16200,
+        "to_sec": 18000,
+        "count": 1897
+      },
+      {
+        "from_sec": 18000,
+        "to_sec": 19800,
+        "count": 882
+      },
+      {
+        "from_sec": 19800,
+        "to_sec": 21600,
+        "count": 229
+      },
+      {
+        "from_sec": 21600,
+        "to_sec": 23400,
+        "count": 39
+      },
+      {
+        "from_sec": 23400,
+        "to_sec": 25200,
+        "count": 0
+      }
+    ],
+    "splits": {
+      "first_half": {
+        "avg_sec": 7320,
+        "top10_sec": 5280,
+        "note": "flach, schnell"
+      },
+      "second_half": {
+        "avg_sec": 7800,
+        "top10_sec": 5460,
+        "note": "leicht wellig"
+      }
+    },
+    "ag_distribution": [
+      {
+        "ag": "AK<30",
+        "count": 1276,
+        "median_sec": 14400
+      },
+      {
+        "ag": "AK30-34",
+        "count": 1732,
+        "median_sec": 14700
+      },
+      {
+        "ag": "AK35-39",
+        "count": 1915,
+        "median_sec": 15000
+      },
+      {
+        "ag": "AK40-44",
+        "count": 1641,
+        "median_sec": 15300
+      },
+      {
+        "ag": "AK45-49",
+        "count": 1368,
+        "median_sec": 15720
+      },
+      {
+        "ag": "AK50+",
+        "count": 1185,
+        "median_sec": 16500
+      }
+    ],
+    "source_note": "SYNTHETISCH — statistisch plausibles Modell zum Bau, keine echten Daten"
+  },
+  {
+    "slug": "hyrox-muenchen-2026",
+    "name": "HYROX München",
+    "sport_type": "hyrox",
+    "year": 2026,
+    "finisher_count": 3400,
+    "avg": 4730,
+    "median": 4710,
+    "best": 3120,
+    "distribution": [
+      {
+        "from_sec": 3000,
+        "to_sec": 3300,
+        "count": 54
+      },
+      {
+        "from_sec": 3300,
+        "to_sec": 3600,
+        "count": 160
+      },
+      {
+        "from_sec": 3600,
+        "to_sec": 3900,
+        "count": 257
+      },
+      {
+        "from_sec": 3900,
+        "to_sec": 4200,
+        "count": 379
+      },
+      {
+        "from_sec": 4200,
+        "to_sec": 4500,
+        "count": 470
+      },
+      {
+        "from_sec": 4500,
+        "to_sec": 4800,
+        "count": 516
+      },
+      {
+        "from_sec": 4800,
+        "to_sec": 5100,
+        "count": 522
+      },
+      {
+        "from_sec": 5100,
+        "to_sec": 5400,
+        "count": 385
+      },
+      {
+        "from_sec": 5400,
+        "to_sec": 5700,
+        "count": 309
+      },
+      {
+        "from_sec": 5700,
+        "to_sec": 6000,
+        "count": 189
+      },
+      {
+        "from_sec": 6000,
+        "to_sec": 6300,
+        "count": 102
+      },
+      {
+        "from_sec": 6300,
+        "to_sec": 6600,
+        "count": 45
+      },
+      {
+        "from_sec": 6600,
+        "to_sec": 6900,
+        "count": 8
+      },
+      {
+        "from_sec": 6900,
+        "to_sec": 7200,
+        "count": 4
+      },
+      {
+        "from_sec": 7200,
+        "to_sec": 7500,
+        "count": 0
+      }
+    ],
+    "splits": {
+      "running_total": {
+        "avg_sec": 2280,
+        "top10_sec": 1800,
+        "note": "8×1 km"
+      },
+      "stations_total": {
+        "avg_sec": 2400,
+        "top10_sec": 1800,
+        "note": "8 Stationen"
+      },
+      "roxzone": {
+        "avg_sec": 240,
+        "top10_sec": 120,
+        "note": "Übergänge"
+      }
+    },
+    "ag_distribution": [
+      {
+        "ag": "AK<30",
+        "count": 952,
+        "median_sec": 4440
+      },
+      {
+        "ag": "AK30-34",
+        "count": 816,
+        "median_sec": 4560
+      },
+      {
+        "ag": "AK35-39",
+        "count": 680,
+        "median_sec": 4680
+      },
+      {
+        "ag": "AK40-44",
+        "count": 510,
+        "median_sec": 4920
+      },
+      {
+        "ag": "AK45+",
+        "count": 442,
+        "median_sec": 5400
+      }
+    ],
+    "source_note": "SYNTHETISCH — statistisch plausibles Modell zum Bau, keine echten Daten"
+  }
+]
