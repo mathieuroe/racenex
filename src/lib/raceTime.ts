@@ -18,3 +18,16 @@ export function formatRaceTime(seconds: number): string {
   const pad = (n: number) => n.toString().padStart(2, "0");
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
+
+export function formatCountdown(isoDate: string): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(isoDate);
+  target.setHours(0, 0, 0, 0);
+  const days = Math.round((target.getTime() - today.getTime()) / 86_400_000);
+
+  if (days === 0) return "heute";
+  if (days === 1) return "morgen";
+  if (days > 1) return `in ${days} Tagen`;
+  return "vorbei";
+}
