@@ -101,6 +101,32 @@ export default async function EventDetailPage({
   const threshold = event.activation_threshold ?? 20;
   const progress = Math.min(participantRows.length / threshold, 1);
 
+  const { data: statsRows } = await supabase
+    .from("event_stats")
+    .select(
+      "year, finisher_count, avg_finish_sec, median_finish_sec, best_finish_sec, distribution, ag_distribution",
+    )
+    .eq("event_id", event.id)
+    .order("year", { ascending: false })
+    .limit(1);
+
+  const stats = (statsRows?.[0] ?? null) as {
+    year: number;
+    finisher_count: number;
+    avg_finish_sec: number | null;
+    median_finish_sec: number | null;
+    best_finish_sec: number | null;
+    distribution: { from_sec: number; to_sec: number; count: number }[] | null;
+    ag_distribution: { ag: string; count: number; median_sec: number }[] | null;
+  } | null;
+
+  const maxBucketCount = stats?.distribution?.length
+    ? Math.max(...stats.distribution.map((b) => b.count))
+    : 0;
+  const maxAgCount = stats?.ag_distribution?.length
+    ? Math.max(...stats.ag_distribution.map((a) => a.count))
+    : 0;
+
   return (
     <>
       <header className="border-b border-line bg-void/85 backdrop-blur-md">
@@ -203,6 +229,123 @@ export default async function EventDetailPage({
               </p>
             )}
           </div>
+
+          {stats && (
+            <div className="mt-10">
+              <h2 className="mb-4 font-display text-[20px] font-bold uppercase tracking-[0.01em]">
+                Ausgabe {stats.year}
+              </h2>
+              <div className="rounded-xl border border-line bg-carbon p-6">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  <div>
+                    <div className="text-[11.5px] uppercase tracking-[0.08em] text-fog">
+                      Finisher
+                    </div>
+                    <div className="mt-1 font-display text-[20px] font-extrabold tabular-nums">
+                      {stats.finisher_count}
+                    </div>
+                  </div>
+                  {stats.best_finish_sec !== null && (
+                    <div>
+                      <div className="text-[11.5px] uppercase tracking-[0.08em] text-fog">
+                        Bestzeit
+                      </div>
+                      <div className="mt-1 font-display text-[20px] font-extrabold tabular-nums text-signal">
+                        {formatRaceTime(stats.best_finish_sec)}
+                      </div>
+                    </div>
+                  )}
+                  {stats.median_finish_sec !== null && (
+                    <div>
+                      <div className="text-[11.5px] uppercase tracking-[0.08em] text-fog">
+                        Median
+                      </div>
+                      <div className="mt-1 font-display text-[20px] font-extrabold tabular-nums">
+                        {formatRaceTime(stats.median_finish_sec)}
+                      </div>
+                    </div>
+                  )}
+                  {stats.avg_finish_sec !== null && (
+                    <div>
+                      <div className="text-[11.5px] uppercase tracking-[0.08em] text-fog">
+                        Schnitt
+                      </div>
+                      <div className="mt-1 font-display text-[20px] font-extrabold tabular-nums">
+                        {formatRaceTime(stats.avg_finish_sec)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {stats.distribution && stats.distribution.length > 0 && (
+                  <div className="mt-6">
+                    <div className="mb-2 text-[11.5px] uppercase tracking-[0.08em] text-fog">
+                      Zielzeit-Verteilung
+                    </div>
+                    <div className="flex h-20 items-end gap-[3px]">
+                      {stats.distribution.map((bucket) => (
+                        <div
+                          key={bucket.from_sec}
+                          title={`${formatRaceTime(bucket.from_sec)}–${formatRaceTime(bucket.to_sec)}: ${bucket.count}`}
+                          className="min-h-[3px] flex-1 rounded-t bg-signal"
+                          style={{
+                            height: `${(bucket.count / maxBucketCount) * 100}%`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-1.5 flex justify-between text-[11px] text-fog">
+                      <span>
+                        {formatRaceTime(stats.distribution[0].from_sec)}
+                      </span>
+                      <span>
+                        {formatRaceTime(
+                          stats.distribution[stats.distribution.length - 1]
+                            .to_sec,
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {stats.ag_distribution && stats.ag_distribution.length > 0 && (
+                  <div className="mt-6">
+                    <div className="mb-2 text-[11.5px] uppercase tracking-[0.08em] text-fog">
+                      Nach Altersklasse
+                    </div>
+                    <div className="grid gap-1.5">
+                      {stats.ag_distribution.map((a) => (
+                        <div
+                          key={a.ag}
+                          className="flex items-center gap-3 text-[12.5px]"
+                        >
+                          <span className="w-12 shrink-0 font-display font-semibold text-chalk">
+                            {a.ag}
+                          </span>
+                          <div className="h-2 flex-1 overflow-hidden rounded-full bg-line">
+                            <div
+                              className="h-full rounded-full bg-signal-dim"
+                              style={{
+                                width: `${(a.count / maxAgCount) * 100}%`,
+                              }}
+                            />
+                          </div>
+                          <span className="w-8 shrink-0 text-right tabular-nums text-fog">
+                            {a.count}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <p className="mt-6 text-[11.5px] text-fog">
+                  Anonyme Aggregate aus öffentlichen Ergebnisdaten — keine
+                  Einzelergebnisse.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="mt-10">
             <h2 className="mb-4 font-display text-[20px] font-bold uppercase tracking-[0.01em]">
