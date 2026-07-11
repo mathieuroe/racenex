@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { SPORT_LABEL } from "@/lib/sportLabels";
 
@@ -259,9 +260,10 @@ export default function EventsBrowser({ events }: { events: EventCard[] }) {
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-px overflow-hidden rounded-[14px] border border-line bg-line md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((event) => (
-            <div
+            <Link
               key={event.id}
-              className="flex flex-col gap-3 bg-carbon px-[22px] py-[24px]"
+              href={`/event/${event.slug}`}
+              className="flex flex-col gap-3 bg-carbon px-[22px] py-[24px] transition-colors hover:bg-carbon-2"
             >
               <div className="flex items-center justify-between font-display text-[12.5px] font-bold italic uppercase tracking-[0.08em] text-signal">
                 <span>{SPORT_LABEL[event.sport_type] ?? event.sport_type}</span>
@@ -281,7 +283,7 @@ export default function EventsBrowser({ events }: { events: EventCard[] }) {
                   </span>
                 )}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
