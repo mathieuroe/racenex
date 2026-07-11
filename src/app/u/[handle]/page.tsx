@@ -120,7 +120,7 @@ export default async function AthleteProfilePage({
   const today = new Date().toISOString().slice(0, 10);
   const { data: upcoming } = await supabase
     .from("participations")
-    .select("events!inner(id, name, event_date, city)")
+    .select("events!inner(id, slug, name, event_date, city)")
     .eq("athlete_id", athlete.id)
     .in("status", ["interested", "registered"])
     .gte("events.event_date", today);
@@ -131,6 +131,7 @@ export default async function AthleteProfilePage({
         (p) =>
           p.events as unknown as {
             id: string;
+            slug: string;
             name: string;
             event_date: string;
             city: string | null;
@@ -237,7 +238,10 @@ export default async function AthleteProfilePage({
           {(nextRace || isOwnProfile) && (
             <div className="mt-6">
               {nextRace ? (
-                <div className="flex items-center justify-between gap-4 rounded-xl border border-signal/20 bg-signal/[0.05] px-[18px] py-3.5">
+                <Link
+                  href={`/event/${nextRace.slug}`}
+                  className="flex items-center justify-between gap-4 rounded-xl border border-signal/20 bg-signal/[0.05] px-[18px] py-3.5 transition-colors hover:bg-signal/[0.09]"
+                >
                   <div>
                     <div className="font-display text-[12px] font-bold italic uppercase tracking-[0.1em] text-signal">
                       Nächstes Rennen
@@ -253,7 +257,7 @@ export default async function AthleteProfilePage({
                   <div className="shrink-0 font-display text-[15px] font-extrabold italic text-signal">
                     {formatCountdown(nextRace.event_date)}
                   </div>
-                </div>
+                </Link>
               ) : (
                 <NextRaceForm
                   athleteId={athlete.id}
