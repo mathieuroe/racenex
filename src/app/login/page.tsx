@@ -17,6 +17,29 @@ export default function LoginPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
 
+  async function handleForgotPassword() {
+    if (!email || !email.includes("@")) {
+      setMessage("Erst E-Mail-Adresse eingeben, dann Link anfordern.");
+      setStatus("error");
+      return;
+    }
+
+    setStatus("submitting");
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+
+    if (error) {
+      setMessage("Da ging etwas schief — bitte nochmal versuchen.");
+      setStatus("error");
+      return;
+    }
+
+    setMessage(`Link zum Passwort-Zurücksetzen geschickt an ${email}. Schau in dein Postfach.`);
+    setStatus("sent");
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email || !email.includes("@") || password.length < 6) {
@@ -148,6 +171,15 @@ export default function LoginPage() {
                     ? "Einloggen"
                     : "Registrieren"}
               </button>
+              {mode === "login" && (
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="justify-self-center text-[13.5px] text-fog underline decoration-dotted hover:text-signal"
+                >
+                  Passwort vergessen?
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {
