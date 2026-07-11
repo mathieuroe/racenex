@@ -1,40 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import AuthNav from "@/components/AuthNav";
+import EventsBrowser, { type EventCard } from "@/components/EventsBrowser";
 import { supabase } from "@/lib/supabase";
-import { SPORT_LABEL } from "@/lib/sportLabels";
 
 export const revalidate = 0;
-
-type EventRow = {
-  id: string;
-  slug: string;
-  name: string;
-  sport_type: string;
-  discipline: string | null;
-  distance_label: string | null;
-  event_date: string | null;
-  city: string | null;
-  country_code: string | null;
-};
-
-function formatDate(iso: string | null): string {
-  if (!iso) return "Datum offen";
-  return new Date(iso).toLocaleDateString("de-DE", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export default async function EventsPage() {
   const { data, error } = await supabase
     .from("events")
-    .select("id, slug, name, sport_type, discipline, distance_label, event_date, city, country_code")
+    .select(
+      "id, slug, name, sport_type, discipline, distance_label, event_date, city, country_code",
+    )
     .order("event_date", { ascending: true })
-    .limit(100);
+    .limit(300);
 
-  const events = (data ?? []) as EventRow[];
+  const events = (data ?? []) as EventCard[];
 
   return (
     <>
@@ -56,7 +37,9 @@ export default async function EventsPage() {
               href="/#join"
               className="-skew-x-[4deg] rounded-md bg-signal px-[18px] py-[9px] font-display text-[15px] font-bold italic uppercase tracking-[0.04em] text-white transition-colors hover:bg-chalk hover:text-void max-[720px]:hidden"
             >
-              <span className="inline-block skew-x-[4deg]">Früh dabei sein</span>
+              <span className="inline-block skew-x-[4deg]">
+                Früh dabei sein
+              </span>
             </Link>
           </div>
         </div>
@@ -71,8 +54,8 @@ export default async function EventsPage() {
             Renn-Kalender
           </h1>
           <p className="mt-[18px] max-w-[60ch] text-[15.5px] leading-[1.5] text-fog">
-            Anonyme Event-Daten, importiert aus öffentlichen Rennkalendern — keine Ergebnisse, keine
-            Teilnehmerlisten. {events.length} Einträge.
+            Anonyme Event-Daten, importiert aus öffentlichen Rennkalendern —
+            keine Ergebnisse, keine Teilnehmerlisten. {events.length} Einträge.
           </p>
 
           {error && (
@@ -88,29 +71,8 @@ export default async function EventsPage() {
           )}
 
           {events.length > 0 && (
-            <div className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-[14px] border border-line bg-line md:grid-cols-2 lg:grid-cols-3">
-              {events.map((event) => (
-                <div key={event.id} className="flex flex-col gap-3 bg-carbon px-[22px] py-[24px]">
-                  <div className="flex items-center justify-between font-display text-[12.5px] font-bold italic uppercase tracking-[0.08em] text-signal">
-                    <span>{SPORT_LABEL[event.sport_type] ?? event.sport_type}</span>
-                    <span>{formatDate(event.event_date)}</span>
-                  </div>
-                  <h3 className="font-display text-[19px] font-bold uppercase leading-[1.1]">
-                    {event.name}
-                  </h3>
-                  <div className="mt-auto flex items-center justify-between text-[13.5px] text-fog">
-                    <span>
-                      {event.city ? `${event.city}, ` : ""}
-                      {event.country_code}
-                    </span>
-                    {event.distance_label && (
-                      <span className="font-display font-semibold uppercase text-chalk">
-                        {event.distance_label}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div className="mt-10">
+              <EventsBrowser events={events} />
             </div>
           )}
         </div>
