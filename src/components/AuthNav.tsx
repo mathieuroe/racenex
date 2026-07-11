@@ -20,6 +20,12 @@ export default async function AuthNav() {
     return (
       <div className="flex items-center gap-4">
         <Link
+          href="/events"
+          className="font-display text-[13px] font-bold italic uppercase tracking-[0.08em] text-fog hover:text-chalk"
+        >
+          Events
+        </Link>
+        <Link
           href="/athletes"
           className="font-display text-[13px] font-bold italic uppercase tracking-[0.08em] text-fog hover:text-chalk"
         >
@@ -37,6 +43,12 @@ export default async function AuthNav() {
 
   return (
     <div className="flex items-center gap-4">
+      <Link
+        href="/events"
+        className="font-display text-[13px] font-bold italic uppercase tracking-[0.08em] text-fog hover:text-chalk"
+      >
+        Events
+      </Link>
       <Link
         href="/athletes"
         className="font-display text-[13px] font-bold italic uppercase tracking-[0.08em] text-fog hover:text-chalk"
