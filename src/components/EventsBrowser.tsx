@@ -9,6 +9,7 @@ export type EventCard = {
   name: string;
   sport_type: string;
   discipline: string | null;
+  distance_key: string | null;
   distance_label: string | null;
   event_date: string | null;
   city: string | null;
@@ -24,11 +25,44 @@ function formatDate(iso: string | null): string {
   });
 }
 
+const DISTANCE_ORDER = [
+  "70.3 (Half)",
+  "Ironman (Full)",
+  "Bis 25 km",
+  "25–50 km",
+  "50–100 km",
+  "100+ km",
+];
+
+// Buckets distance into a small, filterable set of categories. Triathlon
+// distances are already clean (70.3 vs. full Ironman); running/trail spans
+// 10–150+ km, so it's bucketed by range instead of shown raw.
+function distanceBucket(event: EventCard): string | null {
+  if (event.sport_type === "triathlon") {
+    return event.distance_key === "140.6"
+      ? "Ironman (Full)"
+      : (event.distance_label ?? null);
+  }
+  if (event.sport_type === "running" && event.distance_key) {
+    const km = parseInt(event.distance_key, 10);
+    if (Number.isNaN(km)) return null;
+    if (km < 25) return "Bis 25 km";
+    if (km < 50) return "25–50 km";
+    if (km < 100) return "50–100 km";
+    return "100+ km";
+  }
+  return null;
+}
+
+type SortMode = "date" | "city";
+
 export default function EventsBrowser({ events }: { events: EventCard[] }) {
   const [query, setQuery] = useState("");
   const [sports, setSports] = useState<Set<string>>(new Set());
+  const [distances, setDistances] = useState<Set<string>>(new Set());
   const [country, setCountry] = useState("");
   const [includePast, setIncludePast] = useState(false);
+  const [sort, setSort] = useState<SortMode>("date");
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
@@ -44,6 +78,18 @@ export default function EventsBrowser({ events }: { events: EventCard[] }) {
     return Array.from(present).sort();
   }, [events]);
 
+  // Distance options depend on which sports are relevant right now, so the
+  // list only ever shows buckets that actually apply (e.g. no 70.3/Ironman
+  // chips once Triathlon is deselected).
+  const availableDistances = useMemo(() => {
+    const relevant =
+      sports.size > 0 ? events.filter((e) => sports.has(e.sport_type)) : events;
+    const present = new Set(
+      relevant.map(distanceBucket).filter(Boolean) as string[],
+    );
+    return DISTANCE_ORDER.filter((d) => present.has(d));
+  }, [events, sports]);
+
   function toggleSport(sport: string) {
     setSports((prev) => {
       const next = new Set(prev);
@@ -53,11 +99,33 @@ export default function EventsBrowser({ events }: { events: EventCard[] }) {
     });
   }
 
+  function toggleDistance(bucket: string) {
+    setDistances((prev) => {
+      const next = new Set(prev);
+      if (next.has(bucket)) next.delete(bucket);
+      else next.add(bucket);
+      return next;
+    });
+  }
+
+  // Selected distance buckets that no longer apply (e.g. the sport that
+  // owned them was deselected) are ignored rather than left filtering
+  // silently against a chip the user can no longer see or clear.
+  const effectiveDistances = useMemo(
+    () => new Set([...distances].filter((d) => availableDistances.includes(d))),
+    [distances, availableDistances],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return events.filter((e) => {
+    const result = events.filter((e) => {
       if (!includePast && e.event_date && e.event_date < today) return false;
       if (sports.size > 0 && !sports.has(e.sport_type)) return false;
+      if (
+        effectiveDistances.size > 0 &&
+        !effectiveDistances.has(distanceBucket(e) ?? "")
+      )
+        return false;
       if (country && e.country_code !== country) return false;
       if (!q) return true;
       return (
@@ -65,7 +133,29 @@ export default function EventsBrowser({ events }: { events: EventCard[] }) {
         (e.city ?? "").toLowerCase().includes(q)
       );
     });
-  }, [events, query, sports, country, includePast, today]);
+
+    if (sort === "city") {
+      return result
+        .slice()
+        .sort(
+          (a, b) =>
+            (a.city ?? "").localeCompare(b.city ?? "") ||
+            (a.event_date ?? "").localeCompare(b.event_date ?? ""),
+        );
+    }
+    return result
+      .slice()
+      .sort((a, b) => (a.event_date ?? "").localeCompare(b.event_date ?? ""));
+  }, [
+    events,
+    query,
+    sports,
+    effectiveDistances,
+    country,
+    includePast,
+    today,
+    sort,
+  ]);
 
   return (
     <div>
@@ -91,6 +181,15 @@ export default function EventsBrowser({ events }: { events: EventCard[] }) {
             ))}
           </select>
         )}
+
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortMode)}
+          className="shrink-0 rounded-[9px] border-[1.5px] border-line bg-void px-4 py-3.5 font-display text-[13px] font-bold uppercase tracking-[0.02em] text-chalk focus:border-signal focus:outline-none"
+        >
+          <option value="date">Nach Datum</option>
+          <option value="city">Nach Ort</option>
+        </select>
 
         <button
           type="button"
@@ -121,6 +220,28 @@ export default function EventsBrowser({ events }: { events: EventCard[] }) {
                 }
               >
                 {SPORT_LABEL[sport] ?? sport}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {availableDistances.length > 1 && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {availableDistances.map((bucket) => {
+            const active = effectiveDistances.has(bucket);
+            return (
+              <button
+                key={bucket}
+                type="button"
+                onClick={() => toggleDistance(bucket)}
+                className={
+                  active
+                    ? "rounded-full border-[1.5px] border-signal-dim bg-signal-dim px-3.5 py-1.5 font-display text-[12px] font-bold italic uppercase tracking-[0.03em] text-white"
+                    : "rounded-full border-[1.5px] border-line bg-carbon px-3.5 py-1.5 font-display text-[12px] font-bold italic uppercase tracking-[0.03em] text-fog hover:border-signal-dim hover:text-signal-dim"
+                }
+              >
+                {bucket}
               </button>
             );
           })}

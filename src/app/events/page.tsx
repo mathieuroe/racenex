@@ -10,7 +10,7 @@ export default async function EventsPage() {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, slug, name, sport_type, discipline, distance_label, event_date, city, country_code",
+      "id, slug, name, sport_type, discipline, distance_key, distance_label, event_date, city, country_code",
     )
     .order("event_date", { ascending: true })
     .limit(300);
