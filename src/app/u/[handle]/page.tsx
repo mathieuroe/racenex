@@ -194,11 +194,19 @@ export default async function AthleteProfilePage({
                   </h1>
                 </div>
                 {viewerAthlete && (
-                  <FollowButton
-                    viewerAthleteId={viewerAthlete.id}
-                    targetAthleteId={athlete.id}
-                    initiallyFollowing={!!existingFollow}
-                  />
+                  <div className="flex shrink-0 gap-2">
+                    <Link
+                      href={`/messages/${athlete.handle}`}
+                      className="rounded-[9px] border-[1.5px] border-line px-4 py-2.5 font-display text-[13px] font-bold italic uppercase tracking-[0.04em] text-fog transition-colors hover:border-signal hover:text-signal"
+                    >
+                      Nachricht
+                    </Link>
+                    <FollowButton
+                      viewerAthleteId={viewerAthlete.id}
+                      targetAthleteId={athlete.id}
+                      initiallyFollowing={!!existingFollow}
+                    />
+                  </div>
                 )}
               </div>
 

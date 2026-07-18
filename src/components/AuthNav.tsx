@@ -56,6 +56,12 @@ export default async function AuthNav() {
         Athleten
       </Link>
       <Link
+        href="/messages"
+        className="font-display text-[13px] font-bold italic uppercase tracking-[0.08em] text-fog hover:text-chalk"
+      >
+        Nachrichten
+      </Link>
+      <Link
         href={athlete ? `/@${athlete.handle}` : "/profile"}
         className="font-display text-[13px] font-bold italic uppercase tracking-[0.08em] text-signal hover:text-chalk"
       >
