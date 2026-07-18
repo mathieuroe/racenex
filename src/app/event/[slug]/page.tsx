@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Avatar from "@/components/Avatar";
+import EventDiscussion, { type PostNode } from "@/components/EventDiscussion";
 import JoinEventButton from "@/components/JoinEventButton";
 import { supabase } from "@/lib/supabase";
 import { createClient } from "@/lib/supabase-server";
@@ -126,6 +127,52 @@ export default async function EventDetailPage({
   const maxAgCount = stats?.ag_distribution?.length
     ? Math.max(...stats.ag_distribution.map((a) => a.count))
     : 0;
+
+  const { data: postRows } = event.is_activated
+    ? await supabase
+        .from("posts")
+        .select(
+          "id, parent_id, body, created_at, athletes(handle, display_name, avatar_url)",
+        )
+        .eq("event_id", event.id)
+        .order("created_at", { ascending: true })
+    : { data: null };
+
+  type RawPost = {
+    id: string;
+    parent_id: string | null;
+    body: string;
+    created_at: string;
+    athletes: {
+      handle: string;
+      display_name: string;
+      avatar_url: string | null;
+    } | null;
+  };
+
+  const rawPosts = (postRows ?? []) as unknown as RawPost[];
+  const postMap = new Map<string, PostNode>(
+    rawPosts.map((p) => [
+      p.id,
+      {
+        id: p.id,
+        body: p.body,
+        created_at: p.created_at,
+        athlete: p.athletes,
+        replies: [],
+      },
+    ]),
+  );
+  const topLevelPosts: PostNode[] = [];
+  for (const p of rawPosts) {
+    const node = postMap.get(p.id)!;
+    if (p.parent_id && postMap.has(p.parent_id)) {
+      postMap.get(p.parent_id)!.replies.push(node);
+    } else if (!p.parent_id) {
+      topLevelPosts.push(node);
+    }
+  }
+  topLevelPosts.reverse();
 
   return (
     <>
@@ -382,6 +429,23 @@ export default async function EventDetailPage({
                     )}
                   </Link>
                 ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-10">
+            <h2 className="mb-4 font-display text-[20px] font-bold uppercase tracking-[0.01em]">
+              Community
+            </h2>
+            {event.is_activated ? (
+              <EventDiscussion
+                eventId={event.id}
+                viewerAthleteId={viewerAthlete?.id ?? null}
+                posts={topLevelPosts}
+              />
+            ) : (
+              <div className="rounded-xl border border-line bg-carbon px-6 py-8 text-center text-[14.5px] text-fog">
+                {`Öffnet, sobald ${threshold} Athleten „dabei“ sind — aktuell ${participantRows.length}.`}
               </div>
             )}
           </div>
