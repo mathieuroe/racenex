@@ -18,6 +18,26 @@ export type PostNode = {
   replies: PostNode[];
 };
 
+const STARTER_TOPICS = [
+  {
+    label: "Mitfahrgelegenheit",
+    starter: "Sucht jemand eine Mitfahrgelegenheit? Ich starte von ",
+  },
+  {
+    label: "Treffpunkt",
+    starter: "Wer will sich vor dem Start treffen? Ich bin so gegen ",
+  },
+  {
+    label: "Pace-Gruppe",
+    starter: "Wer läuft ungefähr mein Tempo? Ich peile eine Zielzeit von ",
+  },
+  {
+    label: "Unterkunft",
+    starter: "Hat jemand Tipps für Unterkünfte in der Nähe? ",
+  },
+  { label: "Wetter", starter: "Wie sieht's mit dem Wetter am Renntag aus? " },
+];
+
 function formatTimestamp(iso: string): string {
   return new Date(iso).toLocaleDateString("de-DE", {
     day: "2-digit",
@@ -74,13 +94,11 @@ export default function EventDiscussion({
     if (!viewerAthleteId || !newPost.trim()) return;
     setPending(true);
     const supabase = createClient();
-    const { error } = await supabase
-      .from("posts")
-      .insert({
-        event_id: eventId,
-        athlete_id: viewerAthleteId,
-        body: newPost.trim(),
-      });
+    const { error } = await supabase.from("posts").insert({
+      event_id: eventId,
+      athlete_id: viewerAthleteId,
+      body: newPost.trim(),
+    });
     setPending(false);
     if (!error) {
       setNewPost("");
@@ -109,22 +127,36 @@ export default function EventDiscussion({
   return (
     <div>
       {viewerAthleteId && (
-        <div className="mb-5 flex gap-3">
-          <textarea
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
-            placeholder="Frag was, oder such Mitfahrer für dieses Rennen…"
-            rows={2}
-            className="w-full resize-none rounded-[9px] border-[1.5px] border-line bg-void px-[15px] py-3 text-[14.5px] text-chalk transition-colors placeholder:text-[#5A636E] focus:border-signal focus:outline-none"
-          />
-          <button
-            type="button"
-            onClick={submitPost}
-            disabled={pending || !newPost.trim()}
-            className="shrink-0 self-end rounded-[9px] bg-signal px-4 py-3 font-display text-[13px] font-extrabold italic uppercase tracking-[0.03em] text-white transition-colors hover:bg-signal-dim disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Posten
-          </button>
+        <div className="mb-5">
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {STARTER_TOPICS.map((topic) => (
+              <button
+                key={topic.label}
+                type="button"
+                onClick={() => setNewPost(topic.starter)}
+                className="rounded-full border border-line px-3 py-1 text-[12px] font-medium text-fog transition-colors hover:border-signal hover:text-signal"
+              >
+                {topic.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-3">
+            <textarea
+              value={newPost}
+              onChange={(e) => setNewPost(e.target.value)}
+              placeholder="Frag was, oder such Mitfahrer für dieses Rennen…"
+              rows={2}
+              className="w-full resize-none rounded-[9px] border-[1.5px] border-line bg-void px-[15px] py-3 text-[14.5px] text-chalk transition-colors placeholder:text-[#5A636E] focus:border-signal focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={submitPost}
+              disabled={pending || !newPost.trim()}
+              className="shrink-0 self-end rounded-[9px] bg-signal px-4 py-3 font-display text-[13px] font-extrabold italic uppercase tracking-[0.03em] text-white transition-colors hover:bg-signal-dim disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Posten
+            </button>
+          </div>
         </div>
       )}
 
